@@ -39,7 +39,7 @@
          follow (register notifications)
          data (float-array                                      ;deo za formiranje ulaznih parametara za problem 8 dama
                  (with-local-vars [p ()]
-                 (let [k (atom 0) n 4 x (make-array Integer/TYPE n)]
+                 (let [k (atom 0) n 6 x (make-array Integer/TYPE n)]
                  (while (or (pos? @k) (zero? @k))
                   (aset x @k (inc (aget x @k)))
                   (if-not (> (aget x @k) n)
