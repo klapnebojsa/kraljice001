@@ -91,7 +91,7 @@
         (set-args! kraljice_brojac cl-data cl-brpolja cl-partial-sums cl-output) => kraljice_brojac
         ;(set-args! kraljice_brojac cl-data cl-output) => kraljice_brojac
         (enq-write! cqueue cl-data data) => cqueue                                 ;SETUJE VREDNOST GLOBALNE PROMENJIVE cl-data SA VREDNOSCU data
-        (enq-write! cqueue cl-brpolja brpolja) => cqueue
+        ;(enq-write! cqueue cl-brpolja brpolja) => cqueue
         
         ;(println "data: " (seq data))        
         (enq-nd! cqueue kraljice_brojac (work-size [1]) nil profile-event)
