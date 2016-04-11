@@ -37,19 +37,20 @@
          workgroup-size 256
          notifications (chan)
          follow (register notifications)
-         data (float-array                                      ;deo za formiranje ulaznih parametara za problem 8 dama
-                 (with-local-vars [p ()]
-                 (let [k (atom 0) n 6 x (make-array Integer/TYPE n)]
-                 (while (or (pos? @k) (zero? @k))
-                  (aset x @k (inc (aget x @k)))
-                  (if-not (> (aget x @k) n)
-                    (do                            ;then 1
-                      (if (= @k (- n 1))
-                        (var-set p (conj @p (Float/parseFloat (clojure.string/join "" (vec x))))) ;then 2
-                        (aset x (swap! k inc) 0)))                                                ;else 2
-                    (swap! k dec))))               ;else 1
-                 @p))
-         ;(float-array (clojure.edn/read-string (slurp "examples/kraljice.dat")))     ;deo za citanje ulaznih podataka za problem 8 dama
+         brpolja 6
+         data #_(int-array                  ;deo za formiranje ulaznih parametara za problem 8 dama
+                  (with-local-vars [p ()]
+                    (let [k (atom 0) n brpolja x (make-array Integer/TYPE n)]
+                      (while (or (pos? @k) (zero? @k))
+                        (aset x @k (inc (aget x @k)))
+                        (if-not (> (aget x @k) n)
+                          (do                            ;then 1
+                            (if (= @k (- n 1))
+                              (var-set p (conj @p (Integer. (clojure.string/join "" (vec x))))) ;then 2
+                              (aset x (swap! k inc) 0)))                                        ;else 2
+                          (swap! k dec))))               ;else 1
+                    @p))
+         (int-array (clojure.edn/read-string (slurp "podaci/kraljice.dat")))     ;deo za citanje ulaznih podataka za problem 8 dama
          
          ;data (float-array (repeatedly num-items #(rand-int num-items)))
          ;data (float-array (repeatedly num-items #(let [p (rand-int num-items)]
@@ -61,11 +62,12 @@
          output (float-array 1)               ;pocetna vrednost jedan clan sa vrednoscu 0.0
          ] 
      
-         (spit "examples/kraljice.dat" (prn-str (seq data)))   ;Upisuje podatke u fajl kraljice.dat    
-         ;(println "data" (seq data))
+         ;(spit "podaci/kraljice.dat" (prn-str (seq data)))   ;Upisuje podatke u fajl kraljice.dat    
+         (println "data" (seq data))
         
      (println "ooooooooooooooooo")
      (with-release [cl-data (cl-buffer ctx bytesize :read-only)
+                    cl-brpolja (cl-buffer ctx bytesize :read-only)                    
                     cl-output (cl-buffer ctx bytesize :write-only)
                     cl-partial-output (cl-buffer ctx (/ bytesize workgroup-size)   ;kreira cl_buffer objekat u kontekstu ctx velicine (4 * 2na20 / 256 = 2na14) i read-write ogranicenjima
                                        :read-write)
@@ -86,9 +88,10 @@
        (println "============ Naive reduction ======================================")
        
         ;; ============ Naive reduction ======================================
-        (set-args! kraljice_brojac cl-data cl-partial-sums cl-output) => kraljice_brojac
+        (set-args! kraljice_brojac cl-data cl-brpolja cl-partial-sums cl-output) => kraljice_brojac
         ;(set-args! kraljice_brojac cl-data cl-output) => kraljice_brojac
         (enq-write! cqueue cl-data data) => cqueue                                 ;SETUJE VREDNOST GLOBALNE PROMENJIVE cl-data SA VREDNOSCU data
+        (enq-write! cqueue cl-brpolja brpolja) => cqueue
         
         ;(println "data: " (seq data))        
         (enq-nd! cqueue kraljice_brojac (work-size [1]) nil profile-event)
