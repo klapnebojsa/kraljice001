@@ -37,7 +37,7 @@
          workgroup-size 256
          notifications (chan)
          follow (register notifications)
-         brpolja (int-array 1 6)
+         brpolja (int-array 1 8)
          data (int-array                  ;deo za formiranje ulaznih parametara za problem 8 dama
                  (with-local-vars [p ()]
                    (let [k (atom 0) n (aget brpolja 0) x (make-array Integer/TYPE n)]
